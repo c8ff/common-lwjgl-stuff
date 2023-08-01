@@ -1,0 +1,58 @@
+plugins {
+    id 'java'
+    id 'idea'
+}
+
+var lwjglVersion = "3.3.2"
+group = 'dev.seeight'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    var dl = System.getenv("dumb_libraries")
+    implementation fileTree(dir: "${dl}/simple-renderer", include: ['*.jar'])
+
+    implementation "commons-io:commons-io:2.13.0"
+    implementation "org.jetbrains:annotations:24.0.1"
+
+    implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+
+    implementation "org.lwjgl:lwjgl"
+    implementation "org.lwjgl:lwjgl-glfw"
+    implementation "org.lwjgl:lwjgl-nfd"
+    implementation "org.lwjgl:lwjgl-opengl"
+    implementation "org.lwjgl:lwjgl-openal"
+    implementation "org.lwjgl:lwjgl-stb"
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+jar {
+    archiveBaseName = "${project.name}"
+}
+
+sourceSets {
+    version = null
+}
+
+javadoc {
+    archivesBaseName = "${project.name}"
+}
+
+tasks.register('copyJar', Copy) {
+    from jar, sourcesJar, javadocJar
+    into "${System.getenv("dumb_libraries")}/${project.name}"
+}
+
+idea {
+    module {
+        downloadJavadoc = true // defaults to false
+        downloadSources = true
+    }
+}
