@@ -12,8 +12,11 @@ repositories {
 }
 
 void downloadLibraries(String path, String... urls) {
+    var folder = file(path)
+    if (!folder.exists()) folder.mkdirs()
+
     for (final def url in urls) {
-        def filePath = path + url.substring(url.lastIndexOf('/') + 1)
+        def filePath = new File(folder, url.substring(url.lastIndexOf('/') + 1))
 
         var file = file(filePath)
         if (file.exists()) {
