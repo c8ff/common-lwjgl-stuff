@@ -11,9 +11,31 @@ repositories {
     mavenCentral()
 }
 
+void downloadLibraries(String path, String... urls) {
+    for (final def url in urls) {
+        def a = path + url.substring(url.lastIndexOf('/') + 1)
+
+        var file = file(a)
+        if (file.exists()) {
+            continue
+        }
+
+        new URL(url).withInputStream { input -> file.withOutputStream { out -> out << input }}
+    }
+}
+
+void dlRepo(String libName) {
+    def folder = System.getenv("dumb_libraries") ?: "./lib"
+    def repoLoc = "https://github.com/c8ff/${libName}/releases/download/latest"
+    downloadLibraries("${folder}/${libName}/", "${repoLoc}/${libName}.jar", "${repoLoc}/${libName}-javadoc.jar", "${repoLoc}/${libName}-sources.jar")
+
+    this.dependencies {
+        implementation fileTree(dir: "${folder}/${libName}", include: ['*.jar'])
+    }
+}
+
 dependencies {
-    var dl = System.getenv("dumb_libraries")
-    implementation fileTree(dir: "${dl}/simple-renderer", include: ['*.jar'])
+    dlRepo("simple-renderer")
 
     implementation "commons-io:commons-io:2.13.0"
     implementation "org.jetbrains:annotations:24.0.1"
