@@ -13,9 +13,9 @@ repositories {
 
 void downloadLibraries(String path, String... urls) {
     for (final def url in urls) {
-        def a = path + url.substring(url.lastIndexOf('/') + 1)
+        def filePath = path + url.substring(url.lastIndexOf('/') + 1)
 
-        var file = file(a)
+        var file = file(filePath)
         if (file.exists()) {
             continue
         }
