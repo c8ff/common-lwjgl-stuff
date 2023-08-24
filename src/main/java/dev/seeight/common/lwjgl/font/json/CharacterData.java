@@ -14,6 +14,12 @@ public class CharacterData {
 	private double u2;
 	private double v2;
 
+	public transient float renderWidth;
+	public transient float renderHeight;
+	public transient float renderOriginX;
+	public transient float renderOriginY;
+	public transient float renderAdvance;
+
 	public void calcUV(double texWidth, double texHeight) {
 		this.u = (texWidth - this.x) / texWidth;
 		this.v = (texHeight - this.y) / texHeight;
