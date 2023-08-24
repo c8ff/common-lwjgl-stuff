@@ -14,13 +14,12 @@ import java.util.Map;
  */
 @SuppressWarnings("UnusedReturnValue")
 public class FontRenderer {
+	protected final Renderer renderer;
 	protected final Map<Character, CharacterData> characterData;
 	protected int size;
 	protected final Texture texture;
 
 	public final String supportedCharacters;
-
-	protected final Renderer renderer;
 
 	public int FONT_HEIGHT;
 	public float FONT_HEIGHT_FLOAT;
@@ -75,10 +74,12 @@ public class FontRenderer {
 			CharacterData data = this.getCharacterData(c);
 			if (data != null) {
 				this.drawChar(data, x, y);
-				x += this.getCharacterWidth(data);
+				x += this.getCharacterWidth(c, data);
 			} else if (this.isNewLine(c)) {
 				x = startX;
 				y += this.getNewLineHeight();
+			} else {
+				x += this.handleInvalidCharacter(startX, x, y, c);
 			}
 		}
 
@@ -112,35 +113,19 @@ public class FontRenderer {
 	 * @return The width of the characters.
 	 */
 	public float getWidthFloat(char[] cs) {
-		float width = 0;
-		for (char c : cs) {
-			CharacterData data = characterData.get(c);
-			if (data != null) {
-				width += this.getCharacterWidth(data);
-			} else if (this.isNewLine(c)) {
-				width = 0;
-			}
-		}
-		return width;
+		return getWidthFloat(cs, 0, cs.length);
 	}
 
-	public float getWidthFloat(String string, int maxIndex) {
-		return this.getWidthFloat(string.toCharArray(), maxIndex);
+	public float getWidthFloat(String string, int end) {
+		return this.getWidthFloat(string, 0, end);
 	}
 
-	public float getWidthFloat(char[] chars, int maxIndex) {
-		float width = 0;
-		for (int i = 0, len = Math.min(chars.length, maxIndex); i < len; i++) {
-			char c = chars[i];
-			CharacterData data = this.getCharacterData(c);
-			if (data != null) {
-				width += this.getCharacterWidth(data);
-			} else if (this.isNewLine(c)) {
-				width = 0;
-			}
-		}
+	public float getWidthFloat(String string, int start, int end) {
+		return this.getWidthFloat(string.toCharArray(), start, end);
+	}
 
-		return width;
+	public float getWidthFloat(char[] chars, int end) {
+		return getWidthFloat(chars, 0, end);
 	}
 
 	public float getWidthFloat(char[] chars, int start, int end) {
@@ -149,9 +134,11 @@ public class FontRenderer {
 			char c = chars[i];
 			CharacterData data = this.getCharacterData(c);
 			if (data != null) {
-				width += this.getCharacterWidth(data);
+				width += this.getCharacterWidth(c, data);
 			} else if (this.isNewLine(c)) {
 				width = 0;
+			} else {
+				width += this.handleInvalidCharacter(0, width, 0, c);
 			}
 		}
 
@@ -169,8 +156,13 @@ public class FontRenderer {
 	 * @return The height of the characters.
 	 */
 	public float getHeightFloat(char[] chars) {
+		return getHeightFloat(chars, 0, chars.length);
+	}
+
+	public float getHeightFloat(char[] chars, int start, int end) {
 		float height = this.getNewLineHeight();
-		for (char c : chars) {
+		for (int i = start, i1 = Math.min(chars.length, end); i < i1; i++) {
+			char c = chars[i];
 			if (this.isNewLine(c)) {
 				height += this.getNewLineHeight();
 			}
@@ -194,11 +186,17 @@ public class FontRenderer {
 		return FONT_HEIGHT_FLOAT * scaleY;
 	}
 
-	protected float getCharacterWidth(CharacterData characterData) {
+	@SuppressWarnings("unused")
+	protected float getCharacterWidth(char c, CharacterData characterData) {
 		if (characterData != null) {
 			return characterData.advance * scaleX;
 		}
 
+		return 0;
+	}
+
+	@SuppressWarnings("unused")
+	protected float handleInvalidCharacter(double startX, double x, double y, char c) {
 		return 0;
 	}
 }
