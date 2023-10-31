@@ -5,14 +5,36 @@ public class CharacterData {
 	public int y;
 	public int width;
 	public int height;
-	public int originX;
-	public int originY;
-	public int advance;
+	public float originX;
+	public float originY;
+	public float advance;
 
 	private double u;
 	private double v;
 	private double u2;
 	private double v2;
+
+	public CharacterData() {
+
+	}
+
+	public CharacterData(int width, int height, float originX, float originY, float advance, double u, double v, double u2, double v2, float scale) {
+		this.width = width;
+		this.height = height;
+		this.originX = originX;
+		this.originY = originY;
+		this.advance = advance;
+		this.u = u;
+		this.v = v;
+		this.u2 = u2;
+		this.v2 = v2;
+
+		this.renderWidth = this.width * scale;
+		this.renderHeight = this.height * scale;
+		this.renderOriginX = this.originX * scale;
+		this.renderOriginY = this.originY * scale;
+		this.renderAdvance = this.advance * scale;
+	}
 
 	public transient float renderWidth;
 	public transient float renderHeight;
