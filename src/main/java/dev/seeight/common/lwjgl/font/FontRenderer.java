@@ -144,6 +144,7 @@ public class FontRenderer {
 		}
 
 		double startX = x;
+		double maxX = x;
 		for (int i = start; i < end; i++) {
 			char c = characters[i];
 			CharacterData data = this.getCharacterData(c);
@@ -159,9 +160,13 @@ public class FontRenderer {
 
 				x += this.getCharacterWidth(c, data);
 			}
+
+			if (x > maxX) {
+				maxX = x;
+			}
 		}
 
-		return x;
+		return maxX;
 	}
 
 	/**
