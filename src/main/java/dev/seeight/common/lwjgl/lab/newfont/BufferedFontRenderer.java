@@ -208,7 +208,8 @@ public class BufferedFontRenderer implements IFontRenderer {
 	}
 
 	@Override
-	public void drawChar(IFont font, @NotNull CharacterData data, float x, float _y) {
+	public void drawChar(IFont font, @NotNull CharacterData data, float _x, float _y) {
+		float x = _x + data.renderOriginX * this.getScaleX();
 		float y = _y + data.renderOriginY * this.getScaleY();
 		float x2 = x + data.renderWidth * this.getScaleX();
 		float y2 = y + data.renderHeight * this.getScaleY();
