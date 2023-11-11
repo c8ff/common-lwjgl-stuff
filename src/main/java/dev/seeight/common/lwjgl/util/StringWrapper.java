@@ -2,6 +2,7 @@ package dev.seeight.common.lwjgl.util;
 
 import dev.seeight.common.lwjgl.font.FontRenderer;
 import dev.seeight.common.lwjgl.font.json.CharacterData;
+import dev.seeight.common.lwjgl.lab.newfont.IFont;
 
 public class StringWrapper {
     public static void drawCenteredString(FontRenderer font, final char[] chars, double x, double y) {
@@ -45,6 +46,60 @@ public class StringWrapper {
 
     @SuppressWarnings("SameParameterValue")
     public static String wrapString(FontRenderer font, final String string, final int maxWidth) {
+        StringBuilder builder = new StringBuilder();
+        int width = 0;
+        char[] chars = string.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            char c = chars[i];
+
+            // Reset for every new line, as it is already 'wrapped'.
+            if (c == '\n') {
+                builder.append(c);
+                width = 0;
+                continue;
+            }
+
+            // Add the current character's advance
+            CharacterData characterData = font.getCharacterData(c);
+            if (characterData != null) {
+                width += characterData.advance;
+            }
+
+            // Check if it should wrap the string
+            if (c == ' ') {
+                int extraWidth = 0;
+                int i1 = i;
+
+                // Calculate the word's width (or the width to the next ' ' character)
+                for (; i1 < chars.length; i1++) {
+                    char c1 = chars[i1];
+
+                    CharacterData cd = font.getCharacterData(c);
+                    if (cd != null) {
+                        extraWidth += cd.advance;
+                    }
+
+                    if (c1 == ' ' || width + extraWidth > maxWidth) {
+                        break;
+                    }
+                }
+
+                // Append '\n' in case the word's width is larger than the specified amount.
+                if (width + extraWidth > maxWidth) {
+                    width = 0;
+                    builder.append('\n');
+                } else {
+                    builder.append(c);
+                }
+            } else {
+                builder.append(c);
+            }
+        }
+
+        return builder.toString();
+    }
+
+    public static String wrapString(IFont font, final String string, final int maxWidth) {
         StringBuilder builder = new StringBuilder();
         int width = 0;
         char[] chars = string.toCharArray();
