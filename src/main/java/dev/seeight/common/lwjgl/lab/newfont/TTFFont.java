@@ -102,6 +102,9 @@ public class TTFFont implements IFont {
 			descent = _descent.get(0) * sc;
 			lineGap = _lineGap.get(0) * sc;
 
+			// Center the font
+			float fontOffset = (float) Math.ceil(ascent + descent);
+
 			// Convert characters into a friendlier format
 			FloatBuffer x = stack.mallocFloat(1);
 			FloatBuffer y = stack.mallocFloat(1);
@@ -134,7 +137,7 @@ public class TTFFont implements IFont {
 				float width = x1 - x0;
 				float height = y1 - y0;
 				float advance = advanceWidth - width; // or endX - width
-				float originY = y0 + (ascent + descent);
+				float originY = y0 + fontOffset;
 
 				// UV coordinates
 				float u = charInfo.s0();
