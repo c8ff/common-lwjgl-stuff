@@ -81,33 +81,7 @@ public class BufferedFontRenderer implements IFontRenderer {
 		// Create shader
 		this.program = new GLProgram();
 		this.program.delete();
-		this.program.init("""
-				#version 430
-				
-				layout (location = 0) in vec4 vertex;
-
-				uniform mat4 projection;
-				uniform mat4 view;
-				
-				out vec2 fragCoords;
-                
-				void main() {
-					gl_Position = projection * view * vec4(vertex.xy, 0.0, 1.0);
-					fragCoords = vertex.zw;
-				}
-				""", """
-				#version 430
-
-				uniform sampler2D t;
-
-				uniform vec4 shapeColor;
-				in vec2 fragCoords;
-				out vec4 color;
-                
-				void main() {
-					color = texture2D(t, fragCoords) * shapeColor;
-				}
-				""");
+		this.program.init(this.getVertexSource(), this.getFragmentSource());
 		this.renderer.useProgram(this.program);
 
 		// Create vbo.
@@ -256,5 +230,39 @@ public class BufferedFontRenderer implements IFontRenderer {
 	@Override
 	public void drawInvalidChar(IFont font, int codepoint, float x, float y) {
 
+	}
+
+	protected String getVertexSource() {
+		return """
+				#version 430
+				
+				layout (location = 0) in vec4 vertex;
+
+				uniform mat4 projection;
+				uniform mat4 view;
+				
+				out vec2 fragCoords;
+                
+				void main() {
+					gl_Position = projection * view * vec4(vertex.xy, 0.0, 1.0);
+					fragCoords = vertex.zw;
+				}
+				""";
+	}
+
+	protected String getFragmentSource() {
+		return """
+				#version 430
+
+				uniform sampler2D t;
+
+				uniform vec4 shapeColor;
+				in vec2 fragCoords;
+				out vec4 color;
+                
+				void main() {
+					color = texture2D(t, fragCoords) * shapeColor;
+				}
+				""";
 	}
 }
