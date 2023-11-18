@@ -137,4 +137,9 @@ public interface IFontRenderer {
 	float getScaleY();
 
 	void setScaleY(float scaleY);
+
+	default void setScale(float scaleX, float scaleY) {
+		this.setScaleX(scaleX);
+		this.setScaleY(scaleY);
+	}
 }
