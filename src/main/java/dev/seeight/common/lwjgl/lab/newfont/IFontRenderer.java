@@ -115,7 +115,7 @@ public interface IFontRenderer {
 	void drawInvalidChar(IFont font, int codepoint, float x, float y);
 
 	default float getNewLineHeight(IFont font) {
-		return font.getSize();
+		return font.getSize() * this.getScaleY();
 	}
 
 	default boolean isNewLine(int codepoint) {
