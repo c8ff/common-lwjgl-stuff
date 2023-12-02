@@ -130,6 +130,11 @@ public class BufferedFontRenderer implements IFontRenderer {
 			x += getCharacterWidth(font, data, codePoint);
 		}
 
+		// Adjust the return value
+		if (maxX < x) {
+			maxX = x;
+		}
+
 		// Bind the texture
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, font.getTexture().getId());
 
