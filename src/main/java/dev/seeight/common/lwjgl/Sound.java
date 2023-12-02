@@ -43,33 +43,30 @@ public class Sound {
 			throw new UnsupportedOperationException("Unknown format. The file must be a vorbis file.");
 		}
 
-		MemoryStack.stackPush();
-		IntBuffer channelsBuffer = MemoryStack.stackMallocInt(1);
-		MemoryStack.stackPush();
-		IntBuffer sampleRateBuffer = MemoryStack.stackMallocInt(1);
-
+		int channels;
+		int sampleRate;
 		ShortBuffer rawAudioBuffer;
-		if (jar) {
-			try {
-				rawAudioBuffer = STBVorbis.stb_vorbis_decode_memory(IOUtil.byteBufferFrom(Sound.class, path), channelsBuffer, sampleRateBuffer);
-			} catch (IOException e) {
-				throw new RuntimeException("Couldn't read the specified sound file: " + path);
+		try (MemoryStack stack = MemoryStack.stackPush()) {
+			IntBuffer channelsBuffer = stack.mallocInt(1);
+			IntBuffer sampleRateBuffer = stack.mallocInt(1);
+
+			if (jar) {
+				try {
+					rawAudioBuffer = STBVorbis.stb_vorbis_decode_memory(IOUtil.byteBufferFrom(Sound.class, path), channelsBuffer, sampleRateBuffer);
+				} catch (IOException e) {
+					throw new RuntimeException("Couldn't read the specified sound file: " + path, e);
+				}
+			} else {
+				rawAudioBuffer = STBVorbis.stb_vorbis_decode_filename(path, channelsBuffer, sampleRateBuffer);
 			}
-		} else {
-			rawAudioBuffer = STBVorbis.stb_vorbis_decode_filename(path, channelsBuffer, sampleRateBuffer);
+
+			if (rawAudioBuffer == null) {
+				throw new RuntimeException("Couldn't load sound '" + path + "'.");
+			}
+
+			channels = channelsBuffer.get();
+			sampleRate = sampleRateBuffer.get();
 		}
-
-		if (rawAudioBuffer == null) {
-			MemoryStack.stackPop();
-			MemoryStack.stackPop();
-			throw new RuntimeException("Couldn't load sound '" + path + "'.");
-		}
-
-		int channels = channelsBuffer.get();
-		int sampleRate = sampleRateBuffer.get();
-
-		MemoryStack.stackPop();
-		MemoryStack.stackPop();
 
 		int format = -1;
 		if (channels == 1) {
