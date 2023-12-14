@@ -2,6 +2,7 @@ package dev.seeight.common.lwjgl.font;
 
 import dev.seeight.common.lwjgl.font.json.CharacterData;
 import dev.seeight.common.lwjgl.font.json.FontData;
+import dev.seeight.common.lwjgl.fontrenderer.IFontRenderer;
 import dev.seeight.renderer.renderer.Renderer;
 import dev.seeight.renderer.renderer.Texture;
 import org.jetbrains.annotations.NotNull;
@@ -12,8 +13,14 @@ import java.util.Map;
 
 /**
  * Renders fonts.
+ *
  * @author C8FF
+ * @deprecated This class is outdated and slow to render strings.
+ * Also, it's rather inflexible, which causes lots of issues when expanding its use.
+ * The newer version is a combination of {@link IFont} and {@link IFontRenderer}.
+ * They are separated because it provides a lot of benefits that this unified class cannot do.
  */
+@Deprecated
 @SuppressWarnings("UnusedReturnValue")
 public class FontRenderer {
 	/**
@@ -114,6 +121,7 @@ public class FontRenderer {
 
 	/**
 	 * Draws a string at the given coordinates.
+	 *
 	 * @return The X position that the string finishes rendering at.
 	 */
 	public double drawString(@NotNull String str, double x, double y) {
@@ -122,6 +130,7 @@ public class FontRenderer {
 
 	/**
 	 * Draws a string at the given coordinates.
+	 *
 	 * @return The X position that the characters finish rendering at.
 	 */
 	public double drawString(char @NotNull [] characters, double x, double y) {
@@ -130,6 +139,7 @@ public class FontRenderer {
 
 	/**
 	 * Draws a string at the given coordinates.
+	 *
 	 * @return The X position that the characters finish rendering at.
 	 */
 	public double drawString(char @NotNull [] characters, double x, double y, int start, int end) throws IndexOutOfBoundsException {
@@ -203,7 +213,7 @@ public class FontRenderer {
 
 	/**
 	 * @param string The string to calculate the width with.
-	 * @param end The end of the string.
+	 * @param end    The end of the string.
 	 * @return The width of the string.
 	 */
 	public float getWidthFloat(@NotNull String string, int end) throws IndexOutOfBoundsException {
@@ -212,8 +222,8 @@ public class FontRenderer {
 
 	/**
 	 * @param string The string to calculate the width with.
-	 * @param start The beginning of the string.
-	 * @param end The end of the string.
+	 * @param start  The beginning of the string.
+	 * @param end    The end of the string.
 	 * @return The width of the string.
 	 */
 	public float getWidthFloat(@NotNull String string, int start, int end) throws IndexOutOfBoundsException {
@@ -222,7 +232,7 @@ public class FontRenderer {
 
 	/**
 	 * @param chars The characters to calculate the width with.
-	 * @param end The end of the characters.
+	 * @param end   The end of the characters.
 	 * @return The width of the characters.
 	 */
 	public float getWidthFloat(char @NotNull [] chars, int end) throws IndexOutOfBoundsException {
@@ -232,7 +242,7 @@ public class FontRenderer {
 	/**
 	 * @param chars The characters to calculate the width with.
 	 * @param start The beginning of the characters.
-	 * @param end The end of the characters.
+	 * @param end   The end of the characters.
 	 * @return The width of the characters.
 	 */
 	public float getWidthFloat(char @NotNull [] chars, int start, int end) throws IndexOutOfBoundsException {
@@ -279,7 +289,7 @@ public class FontRenderer {
 	/**
 	 * @param chars The characters to calculate the height with.
 	 * @param start The start of the characters.
-	 * @param end The end of the characters.
+	 * @param end   The end of the characters.
 	 * @return The height of the characters.
 	 */
 	public float getHeightFloat(char[] chars, int start, int end) throws IndexOutOfBoundsException {
@@ -332,7 +342,7 @@ public class FontRenderer {
 	}
 
 	/**
-	 * @param c The character
+	 * @param c    The character
 	 * @param data The data of the character.
 	 * @return The width of the character.
 	 */
@@ -347,9 +357,10 @@ public class FontRenderer {
 
 	/**
 	 * Draws an invalid character. Called when {@link #getCharacterData(char)} returns null when rendering a string.
+	 *
 	 * @param startX The X position where the string started from.
-	 * @param x The X position that the current character will be drawn at.
-	 * @param y The Y position that the current character will be drawn at.
+	 * @param x      The X position that the current character will be drawn at.
+	 * @param y      The Y position that the current character will be drawn at.
 	 */
 	@SuppressWarnings("unused")
 	protected void drawInvalidCharacter(double startX, double x, double y, char c) {
