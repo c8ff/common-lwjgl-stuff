@@ -67,17 +67,33 @@ public class BufferedFontRenderer implements IFontRenderer {
 	private final OpenGLRenderer2 renderer;
 
 	/**
+	 * Represents the maximum amount of characters that the buffer can upload/render at once.
+	 */
+	private final int characterCapacity;
+
+	/**
 	 * Constructs a font renderer.
 	 *
 	 * @param renderer An OpenGLRenderer2 instance. This is not used to render
 	 *                 the characters, but to restore the {@code program}, {@code vbo}, and {@code vao}.
 	 */
-	// AMAZING !!!
 	public BufferedFontRenderer(OpenGLRenderer2 renderer) {
-		this.renderer = renderer;
+		this(renderer, 256);
+	}
 
-		// Capacity for (6144 / 3 / 4 = 512) characters. Why would you need more.
-		this.buffer = BufferUtils.createFloatBuffer(6144);
+	/**
+	 * Constructs a font renderer.
+	 *
+	 * @param renderer          An OpenGLRenderer2 instance. This is not used to render
+	 *                          the characters, but to restore the {@code program}, {@code vbo}, and {@code vao}.
+	 * @param characterCapacity The maximum character capacity of the buffer.
+	 */
+	public BufferedFontRenderer(OpenGLRenderer2 renderer, int characterCapacity) {
+		this.renderer = renderer;
+		this.characterCapacity = characterCapacity;
+
+		// Two floats, two vertices, three per triangle, two triangles.
+		this.buffer = BufferUtils.createFloatBuffer(characterCapacity * 2 * 2 * 3 * 2);
 
 		// Create shader
 		this.program = new GLProgram();
@@ -105,6 +121,9 @@ public class BufferedFontRenderer implements IFontRenderer {
 	public float drawString(IFont font, char @NotNull [] characters, float x, float y, int start, int end) throws IndexOutOfBoundsException {
 		if (characters.length == 0)
 			return x;
+
+		if (characterCapacity <= end)
+			end = characterCapacity;
 
 		IFontRenderer.assertIndices(characters.length, start, end);
 
