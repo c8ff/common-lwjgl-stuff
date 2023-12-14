@@ -102,6 +102,9 @@ public class BufferedFontRenderer implements IFontRenderer {
 
 	@Override
 	public float drawString(IFont font, char @NotNull [] characters, float x, float y, int start, int end) throws IndexOutOfBoundsException {
+		if (characters.length == 0)
+			return x;
+
 		IFontRenderer.assertIndices(characters.length, start, end);
 
 		// Build triangles.

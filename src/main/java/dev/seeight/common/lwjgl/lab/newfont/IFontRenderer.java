@@ -17,16 +17,16 @@ public interface IFontRenderer {
 		return drawString(font, string.toCharArray(), x, y, start, end);
 	}
 
-	default float drawString(IFont font, char[] chars, float x, float y) {
-		return drawString(font, chars, x, y, 0, chars.length);
+	default float drawString(IFont font, char[] characters, float x, float y) {
+		return drawString(font, characters, x, y, 0, characters.length);
 	}
 
 	default float getWidthFloat(IFont font, String string) {
 		return getWidthFloat(font, string.toCharArray(), 0, string.length());
 	}
 
-	default float getWidthFloat(IFont font, char[] chars) {
-		return getWidthFloat(font, chars, 0, chars.length);
+	default float getWidthFloat(IFont font, char[] characters) {
+		return getWidthFloat(font, characters, 0, characters.length);
 	}
 
 	default float getHeightFloat(IFont font, String string) {
@@ -37,17 +37,20 @@ public interface IFontRenderer {
 		return getHeightFloat(font, string.toCharArray(), start, end);
 	}
 
-	default float getHeightFloat(IFont font, char[] chars) {
-		return getHeightFloat(font, chars, 0, chars.length);
+	default float getHeightFloat(IFont font, char[] characters) {
+		return getHeightFloat(font, characters, 0, characters.length);
 	}
 
-	default float drawString(IFont font, char[] chars, float x, float y, int start, int end) {
-		IFontRenderer.assertIndices(chars.length, start, end);
+	default float drawString(IFont font, char[] characters, float x, float y, int start, int end) {
+		if (characters.length == 0)
+			return x;
+
+		IFontRenderer.assertIndices(characters.length, start, end);
 
 		float startX = x;
 		float maxX = x;
 		for (int i = start; i < end; i++) {
-			int codePoint = chars[i];
+			int codePoint = characters[i];
 			if (isNewLine(codePoint)) {
 				if (maxX < x) {
 					maxX = x;
@@ -73,13 +76,13 @@ public interface IFontRenderer {
 		return maxX;
 	}
 
-	default float getWidthFloat(IFont font, char[] chars, int start, int end) {
-		IFontRenderer.assertIndices(chars.length, start, end);
+	default float getWidthFloat(IFont font, char[] characters, int start, int end) {
+		IFontRenderer.assertIndices(characters.length, start, end);
 
 		float width = 0;
 		float maxWidth = 0;
 		for (int i = start; i < end; i++) {
-			int codePoint = chars[i];
+			int codePoint = characters[i];
 
 			if (isNewLine(codePoint)) {
 				width = 0;
@@ -96,12 +99,12 @@ public interface IFontRenderer {
 		return width;
 	}
 
-	default float getHeightFloat(IFont font, char[] chars, int start, int end) {
-		IFontRenderer.assertIndices(chars.length, start, end);
+	default float getHeightFloat(IFont font, char[] characters, int start, int end) {
+		IFontRenderer.assertIndices(characters.length, start, end);
 
 		float height = this.getNewLineHeight(font);
 		for (int i = start; i < end; i++) {
-			int codePoint = chars[i];
+			int codePoint = characters[i];
 			if (isNewLine(codePoint)) {
 				height += this.getNewLineHeight(font);
 			}
@@ -145,5 +148,66 @@ public interface IFontRenderer {
 
 	default void setScale(float scale) {
 		this.setScale(scale, scale);
+	}
+
+	default char[] cropString(IFont font, String string, float maxWidth, boolean appendDots) {
+		char[] arr = string.toCharArray();
+		float w = 0;
+		int start = 0;
+		int end = arr.length - 1;
+		boolean isCropped = false;
+		for (int i = arr.length - 1; i >= 0; i--) {
+			char c = arr[i];
+			if (isNewLine(c)) {
+				w = 0;
+			} else {
+				w += getCharacterWidth(font, font.getCharacterData(c), c);
+			}
+
+			if (w > maxWidth) {
+				isCropped = true;
+				break;
+			}
+
+			start = i;
+		}
+
+		if (isCropped) {
+			w = 0;
+			w += getCharacterWidth(font, font.getCharacterData('.'), '.') * 3;
+
+			for (int i = arr.length - 1; i >= 0; i--) {
+				char c = arr[i];
+				if (isNewLine(c)) {
+					w = 0;
+				} else {
+					w += getCharacterWidth(font, font.getCharacterData(c), c);
+				}
+
+				if (w > maxWidth) {
+					break;
+				}
+
+				start = i;
+			}
+		}
+
+		int len = end - start + 1;
+		int arrLen = len;
+		boolean dots = isCropped && appendDots;
+		if (dots) {
+			len += 3;
+		}
+
+		char[] dest = new char[len];
+		System.arraycopy(arr, start, dest, dots ? 3 : 0, arrLen);
+
+		if (dots) {
+			dest[0] = '.';
+			dest[1] = '.';
+			dest[2] = '.';
+		}
+
+		return dest;
 	}
 }
