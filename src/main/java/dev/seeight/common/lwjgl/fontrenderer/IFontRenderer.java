@@ -289,7 +289,7 @@ public interface IFontRenderer {
 	 */
 	default float getCharacterWidth(IFont font, CharacterData data, int codepoint) {
 		if (data != null) {
-			return (data.renderWidth + data.renderAdvance) * this.getScaleX();
+			return data.renderAdvance * this.getScaleX();
 		}
 
 		return 0;

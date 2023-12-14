@@ -136,7 +136,6 @@ public class TTFFont implements IFont {
 				// Calculate the glyph information
 				float width = x1 - x0;
 				float height = y1 - y0;
-				float advance = advanceWidth - width; // or endX - width
 				float originY = y0 + fontOffset;
 
 				// UV coordinates
@@ -149,7 +148,7 @@ public class TTFFont implements IFont {
 					maxHeight = height;
 				}
 
-				glyphs.put(charIndex + firstChar, new CharacterData((int) width, (int) height, originX, originY, advance, u, v, u2, v2, scale));
+				glyphs.put(charIndex + firstChar, new CharacterData((int) width, (int) height, originX, originY, advanceWidth, u, v, u2, v2, scale));
 			}
 		}
 

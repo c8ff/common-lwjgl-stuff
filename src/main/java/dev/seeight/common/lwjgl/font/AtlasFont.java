@@ -13,6 +13,7 @@ public class AtlasFont implements IFont {
 	private final FontData fontData;
 	private final float ascent;
 	private final float descent;
+	private final float maxHeight;
 	private final Map<Integer, CharacterData> characters;
 
 	public AtlasFont(Texture texture, FontData fontData, float scale) {
@@ -23,12 +24,21 @@ public class AtlasFont implements IFont {
 		this.characters = new HashMap<>();
 
 		float[] maxOriginY = new float[1];
+		float[] maxOriginX = new float[1];
 		float[] maxDescent = new float[1];
+		float[] maxHeight = new float[1];
 		this.fontData.characters.forEach((s, c) -> {
 			c.calcUV(texture.getWidth(), texture.getHeight());
 
 			if (maxOriginY[0] < c.originY) {
 				maxOriginY[0] = c.originY;
+			}
+			if (maxOriginX[0] < c.originX) {
+				maxOriginX[0] = c.originX;
+			}
+
+			if (maxHeight[0] < c.height) {
+				maxHeight[0] = c.height;
 			}
 
 			float descent = c.height - c.originY;
@@ -36,18 +46,20 @@ public class AtlasFont implements IFont {
 				maxDescent[0] = descent;
 			}
 
+			characters.put(s.codePointAt(0), c);
+		});
+		this.fontData.characters.forEach((s, c) -> {
 			c.renderWidth = c.width * scale;
 			c.renderHeight = c.height * scale;
-			c.renderOriginX = 0;
-			c.renderOriginY = (fontData.size - c.originY) * scale;
-			c.renderAdvance = (c.advance - c.width + c.originX) * scale;
-
-			characters.put(s.codePointAt(0), c);
+			c.renderOriginX = (maxOriginX[0] - c.originX) * scale;
+			c.renderOriginY = (maxOriginY[0] - c.originY) * scale;
+			c.renderAdvance = c.advance * scale;
 		});
 
 		// TODO: is this correct?
 		this.ascent = maxOriginY[0] * scale;
 		this.descent = -maxDescent[0] * scale;
+		this.maxHeight = maxHeight[0] * scale + this.descent;
 	}
 
 	@Override
@@ -67,7 +79,7 @@ public class AtlasFont implements IFont {
 
 	@Override
 	public float getHeight() {
-		return getSize();
+		return this.maxHeight;
 	}
 
 	@Override
