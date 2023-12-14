@@ -1,6 +1,7 @@
-package dev.seeight.common.lwjgl.lab.newfont;
+package dev.seeight.common.lwjgl.fontrenderer;
 
 import dev.seeight.common.lwjgl.font.json.CharacterData;
+import dev.seeight.common.lwjgl.font.IFont;
 import dev.seeight.renderer.renderer.Renderer;
 
 /**

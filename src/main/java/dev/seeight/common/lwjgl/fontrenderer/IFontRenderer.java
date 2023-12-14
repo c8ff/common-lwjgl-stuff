@@ -1,6 +1,7 @@
-package dev.seeight.common.lwjgl.lab.newfont;
+package dev.seeight.common.lwjgl.fontrenderer;
 
 import dev.seeight.common.lwjgl.font.json.CharacterData;
+import dev.seeight.common.lwjgl.font.IFont;
 
 public interface IFontRenderer {
 	static void assertIndices(int max, int start, int end) throws IndexOutOfBoundsException {

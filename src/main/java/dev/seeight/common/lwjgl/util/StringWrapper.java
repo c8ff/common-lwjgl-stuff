@@ -2,7 +2,7 @@ package dev.seeight.common.lwjgl.util;
 
 import dev.seeight.common.lwjgl.font.FontRenderer;
 import dev.seeight.common.lwjgl.font.json.CharacterData;
-import dev.seeight.common.lwjgl.lab.newfont.IFont;
+import dev.seeight.common.lwjgl.font.IFont;
 
 public class StringWrapper {
     public static void drawCenteredString(FontRenderer font, final char[] chars, double x, double y) {
