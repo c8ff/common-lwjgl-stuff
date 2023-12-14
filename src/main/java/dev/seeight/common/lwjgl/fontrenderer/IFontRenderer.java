@@ -188,6 +188,9 @@ public interface IFontRenderer {
 	 * @throws IndexOutOfBoundsException If {@code start} or {@code end} are out of bounds.
 	 */
 	default float getWidthFloat(IFont font, char[] characters, int start, int end) throws IndexOutOfBoundsException {
+		if (characters.length == 0)
+			return 0;
+
 		IFontRenderer.assertIndices(characters.length, start, end);
 
 		float width = 0;
@@ -221,6 +224,9 @@ public interface IFontRenderer {
 	 * @throws IndexOutOfBoundsException If {@code start} or {@code end} are out of bounds.
 	 */
 	default float getHeightFloat(IFont font, char[] characters, int start, int end) throws IndexOutOfBoundsException {
+		if (characters.length == 0)
+			return 0;
+
 		IFontRenderer.assertIndices(characters.length, start, end);
 
 		float height = this.getNewLineHeight(font);
