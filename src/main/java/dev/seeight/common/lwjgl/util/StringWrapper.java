@@ -62,7 +62,7 @@ public class StringWrapper {
             // Add the current character's advance
             CharacterData characterData = font.getCharacterData(c);
             if (characterData != null) {
-                width += characterData.advance;
+                width += (int) characterData.advance;
             }
 
             // Check if it should wrap the string
@@ -76,7 +76,7 @@ public class StringWrapper {
 
                     CharacterData cd = font.getCharacterData(c);
                     if (cd != null) {
-                        extraWidth += cd.advance;
+                        extraWidth += (int) cd.advance;
                     }
 
                     if (c1 == ' ' || width + extraWidth > maxWidth) {
@@ -116,7 +116,7 @@ public class StringWrapper {
             // Add the current character's advance
             CharacterData characterData = font.getCharacterData(c);
             if (characterData != null) {
-                width += characterData.advance;
+                width += (int) characterData.advance;
             }
 
             // Check if it should wrap the string
@@ -130,7 +130,7 @@ public class StringWrapper {
 
                     CharacterData cd = font.getCharacterData(c);
                     if (cd != null) {
-                        extraWidth += cd.advance;
+                        extraWidth += (int) cd.advance;
                     }
 
                     if (c1 == ' ' || width + extraWidth > maxWidth) {
