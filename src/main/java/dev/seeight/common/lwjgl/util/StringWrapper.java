@@ -91,6 +91,9 @@ public class StringWrapper {
                 } else {
                     builder.append(c);
                 }
+            } else if (width > maxWidth) {
+                width = 0;
+                builder.append('-').append('\n').append(c);
             } else {
                 builder.append(c);
             }
@@ -145,6 +148,9 @@ public class StringWrapper {
                 } else {
                     builder.append(c);
                 }
+            } else if (width > maxWidth) {
+                width = 0;
+                builder.append('-').append('\n').append(c);
             } else {
                 builder.append(c);
             }
