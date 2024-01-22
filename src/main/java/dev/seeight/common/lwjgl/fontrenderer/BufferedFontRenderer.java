@@ -4,9 +4,9 @@ import dev.seeight.common.lwjgl.font.json.CharacterData;
 import dev.seeight.common.lwjgl.font.IFont;
 import dev.seeight.renderer.renderer.gl.GLUtil;
 import dev.seeight.renderer.renderer.gl.OpenGLRenderer2;
+import dev.seeight.renderer.renderer.gl.components.GLArrayBufferObject;
 import dev.seeight.renderer.renderer.gl.components.GLProgram;
 import dev.seeight.renderer.renderer.gl.components.GLVertexArrayObject;
-import dev.seeight.renderer.renderer.gl.components.GLVertexBufferObject;
 import dev.seeight.renderer.renderer.gl.exception.UniformNotFoundException;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.BufferUtils;
@@ -55,7 +55,7 @@ public class BufferedFontRenderer implements IFontRenderer {
 	/**
 	 * The object which the data is uploaded to.
 	 */
-	private final GLVertexBufferObject vbo;
+	private final GLArrayBufferObject vbo;
 	/**
 	 * Determines what is on the {@link #vbo}.
 	 */
@@ -102,7 +102,7 @@ public class BufferedFontRenderer implements IFontRenderer {
 		this.renderer.useProgram(this.program);
 
 		// Create vbo.
-		this.vbo = new GLVertexBufferObject();
+		this.vbo = new GLArrayBufferObject();
 		this.vbo.init(true);
 		// Allocate the maximum capacity.
 		GLUtil.arrayBufferData(this.buffer.capacity() * Float.BYTES, GL15.GL_STATIC_DRAW);
