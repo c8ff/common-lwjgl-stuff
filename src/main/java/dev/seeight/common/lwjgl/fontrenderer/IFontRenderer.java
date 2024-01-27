@@ -268,7 +268,7 @@ public interface IFontRenderer {
 	 * @return The new line height.
 	 */
 	default float getNewLineHeight(IFont font) {
-		return font.getSize() * this.getScaleY();
+		return font.getHeight() * this.getScaleY();
 	}
 
 	/**
