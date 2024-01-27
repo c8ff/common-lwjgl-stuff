@@ -791,6 +791,10 @@ public class Window {
 		return fullscreen;
 	}
 
+	public boolean isFocused() {
+		return focused;
+	}
+
 	public boolean isDecorated() {
 		return decorated;
 	}
