@@ -3,8 +3,11 @@ package dev.seeight.common.lwjgl.util;
 import dev.seeight.common.lwjgl.font.FontRenderer;
 import dev.seeight.common.lwjgl.font.json.CharacterData;
 import dev.seeight.common.lwjgl.font.IFont;
+import dev.seeight.common.lwjgl.fontrenderer.IFontRenderer;
+import org.jetbrains.annotations.Nullable;
 
 public class StringWrapper {
+    @Deprecated
     public static void drawCenteredString(FontRenderer font, final char[] chars, double x, double y) {
         double startX = x;
         for (int i = 0; i < chars.length; i++) {
@@ -44,6 +47,7 @@ public class StringWrapper {
         }
     }
 
+    @Deprecated
     @SuppressWarnings("SameParameterValue")
     public static String wrapString(FontRenderer font, final String string, final int maxWidth) {
         StringBuilder builder = new StringBuilder();
@@ -102,9 +106,13 @@ public class StringWrapper {
         return builder.toString();
     }
 
-    public static String wrapString(IFont font, final String string, final int maxWidth) {
+    public static String wrapString(IFont font, final String string, final float maxWidth) {
+        return wrapString(font, null, string, maxWidth);
+    }
+
+    public static String wrapString(IFont font, @Nullable IFontRenderer fontRenderer, final String string, final float maxWidth) {
         StringBuilder builder = new StringBuilder();
-        int width = 0;
+        float width = 0;
         char[] chars = string.toCharArray();
         for (int i = 0; i < chars.length; i++) {
             char c = chars[i];
@@ -118,22 +126,26 @@ public class StringWrapper {
 
             // Add the current character's advance
             CharacterData characterData = font.getCharacterData(c);
-            if (characterData != null) {
-                width += (int) characterData.advance;
+            if (fontRenderer != null) {
+                width += fontRenderer.getCharacterWidth(font, characterData, c);
+            } else if (characterData != null) {
+	            width += characterData.width;
             }
 
             // Check if it should wrap the string
             if (c == ' ') {
-                int extraWidth = 0;
-                int i1 = i;
+                float extraWidth = 0;
+                int i1 = i + 1;
 
-                // Calculate the word's width (or the width to the next ' ' character)
+                // Calculate the word's width (or the width until the next ' ' character)
                 for (; i1 < chars.length; i1++) {
                     char c1 = chars[i1];
 
-                    CharacterData cd = font.getCharacterData(c);
-                    if (cd != null) {
-                        extraWidth += (int) cd.advance;
+                    CharacterData cd = font.getCharacterData(c1);
+                    if (fontRenderer != null) {
+                        extraWidth += fontRenderer.getCharacterWidth(font, cd, c1);
+                    } else if (cd != null) {
+	                    extraWidth += cd.advance;
                     }
 
                     if (c1 == ' ' || width + extraWidth > maxWidth) {
@@ -148,7 +160,7 @@ public class StringWrapper {
                 } else {
                     builder.append(c);
                 }
-            } else if (width > maxWidth) {
+            } else if (width > maxWidth && c != ',' && c != '.' && c != ';' && c != ':' && c != '!' && c != '?') {
                 width = 0;
                 builder.append('-').append('\n').append(c);
             } else {
