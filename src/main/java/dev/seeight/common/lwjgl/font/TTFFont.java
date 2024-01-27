@@ -108,6 +108,10 @@ public class TTFFont implements IFont {
 			// Convert characters into a friendlier format
 			FloatBuffer x = stack.mallocFloat(1);
 			FloatBuffer y = stack.mallocFloat(1);
+
+			IntBuffer _advanceWidth = stack.mallocInt(1);
+			IntBuffer _leftSideBearing = stack.mallocInt(1);
+
 			for (int charIndex = 0; charIndex < cdata.capacity(); charIndex++) {
 				// Reset the x and y position, as we are not using STB to bake quads.
 				x.clear();
@@ -121,9 +125,7 @@ public class TTFFont implements IFont {
 				// Retrieve horizontal codepoint information
 				// This information can be extracted the baked quad, but I do it this way just to be sure.
 				// It's not like performance is important at initialization... I think.
-				IntBuffer _advanceWidth = stack.mallocInt(1);
-				IntBuffer _leftSideBearing = stack.mallocInt(1);
-				STBTruetype.stbtt_GetCodepointHMetrics(_tempInfo, charIndex + firstChar, _advanceWidth, _leftSideBearing);
+				STBTruetype.stbtt_GetCodepointHMetrics(_tempInfo, charIndex + firstChar, _advanceWidth.clear(), _leftSideBearing.clear());
 				float advanceWidth = _advanceWidth.get(0) * sc;
 				float originX = _leftSideBearing.get(0) * sc;
 
