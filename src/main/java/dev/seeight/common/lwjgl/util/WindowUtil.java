@@ -3,117 +3,116 @@ package dev.seeight.common.lwjgl.util;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.system.MemoryStack;
+
+import java.nio.IntBuffer;
 
 public class WindowUtil {
-    public static void setMonitorMatch(long windowId, MonitorMatch monitorMatch) {
-        GLFW.glfwSetWindowMonitor(windowId, monitorMatch.getId(), monitorMatch.getX(), monitorMatch.getY(), monitorMatch.getWidth(), monitorMatch.getHeight(), GLFW.GLFW_DONT_CARE);
-    }
+	public static void setMonitor(long windowId, Monitor monitor) {
+		GLFW.glfwSetWindowMonitor(windowId, monitor.getId(), monitor.getX(), monitor.getY(), monitor.getWidth(), monitor.getHeight(), GLFW.GLFW_DONT_CARE);
+	}
 
-    // Ported to LWJGL, from https://stackoverflow.com/a/31526753
-    public static MonitorMatch getHoverMonitor(long windowID) throws RuntimeException {
-        int bestOverlap = 0;
+	// Ported to LWJGL, from https://stackoverflow.com/a/31526753
+	public static Monitor getHoverMonitor(long windowID) throws RuntimeException {
+		try (MemoryStack stack = MemoryStack.stackPush()) {
+			IntBuffer b0 = stack.mallocInt(1);
+			IntBuffer b1 = stack.mallocInt(1);
 
-        int[] f = new int[1];
-        int[] f2 = new int[1];
+			GLFW.glfwGetWindowPos(windowID, b0, b1);
+			int x = b0.get();
+			int y = b1.get();
 
-        GLFW.glfwGetWindowPos(windowID, f, f2);
+			GLFW.glfwGetWindowSize(windowID, b0.clear(), b1.clear());
+			int width = b0.get();
+			int height = b1.get();
 
-        int wx = f[0];
-        int wy = f2[0];
+			PointerBuffer monitors = GLFW.glfwGetMonitors();
 
-        GLFW.glfwGetWindowSize(windowID, f, f2);
+			if (monitors == null) {
+				throw new RuntimeException("No monitors from GLFW.");
+			}
 
-        int ww = f[0];
-        int wh = f2[0];
+			int bestOverlap = 0;
+			Monitor result = new Monitor();
+			while (monitors.hasRemaining()) {
+				long monitor = monitors.get();
+				GLFWVidMode mode = GLFW.glfwGetVideoMode(monitor);
 
-        PointerBuffer monitors = GLFW.glfwGetMonitors();
+				if (mode == null) {
+					continue;
+				}
 
-        if (monitors == null) {
-            throw new RuntimeException("Couldn't get monitors from GLFW.");
-        }
+				GLFW.glfwGetMonitorPos(monitor, b0.clear(), b1.clear());
 
-        MonitorMatch monitorMatch = new MonitorMatch();
+				int monitorX = b0.get();
+				int monitorY = b1.get();
+				int monitorWidth = mode.width();
+				int monitorHeight = mode.height();
 
-        while (monitors.hasRemaining()) {
-            long monitor = monitors.get();
+				int overlap = Math.max(0, Math.min(x + width, monitorX + monitorWidth) - Math.max(x, monitorX)) * Math.max(0, Math.min(y + height, monitorY + monitorHeight) - Math.max(y, monitorY));
 
-            GLFWVidMode mode = GLFW.glfwGetVideoMode(monitor);
+				if (bestOverlap < overlap) {
+					bestOverlap = overlap;
+					result.overlap = overlap;
+					result.id = monitor;
+					result.mode = mode;
+					result.x = monitorX;
+					result.y = monitorY;
+					result.width = monitorWidth;
+					result.height = monitorHeight;
+					result.changed = true;
+				}
+			}
 
-            if (mode == null) {
-                continue;
-            }
+			if (!result.changed) {
+				throw new RuntimeException("Couldn't find a matching monitor for window: " + windowID);
+			}
 
-            GLFW.glfwGetMonitorPos(monitor, f, f2);
+			return result;
+		}
+	}
 
-            // monitor x, monitor y, monitor width, monitor height
-            int mx = f[0];
-            int my = f2[0];
-            int mw = mode.width();
-            int mh = mode.height();
+	public static class Monitor {
+		private GLFWVidMode mode;
+		private int x;
+		private int y;
+		private int width;
+		private int height;
+		private long id;
+		private int overlap;
 
-            int overlap = Math.max(0, Math.min(wx + ww, mx + mw) - Math.max(wx, mx)) * Math.max(0, Math.min(wy + wh, my + mh) - Math.max(wy, my));
+		private boolean changed;
 
-            if (bestOverlap < overlap) {
-                bestOverlap = overlap;
-                monitorMatch.overlap = overlap;
-                monitorMatch.id = monitor;
-                monitorMatch.mode = mode;
-                monitorMatch.x = mx;
-                monitorMatch.y = my;
-                monitorMatch.width = mw;
-                monitorMatch.height = mh;
-                monitorMatch.changed = true;
-            }
-        }
+		public GLFWVidMode getMode() {
+			return mode;
+		}
 
-        if (!monitorMatch.changed) {
-            throw new RuntimeException("monitor match wasn't changed (this shouldn't happen)");
-        }
+		public int getX() {
+			return x;
+		}
 
-        return monitorMatch;
-    }
+		public int getY() {
+			return y;
+		}
 
-    public static class MonitorMatch {
-        private GLFWVidMode mode;
-        private int x;
-        private int y;
-        private int width;
-        private int height;
-        private long id;
-        private int overlap;
+		public int getWidth() {
+			return width;
+		}
 
-        private boolean changed;
+		public int getHeight() {
+			return height;
+		}
 
-        public GLFWVidMode getMode() {
-            return mode;
-        }
+		public long getId() {
+			return id;
+		}
 
-        public int getX() {
-            return x;
-        }
+		public int getOverlap() {
+			return overlap;
+		}
 
-        public int getY() {
-            return y;
-        }
-
-        public int getWidth() {
-            return width;
-        }
-
-        public int getHeight() {
-            return height;
-        }
-
-        public long getId() {
-            return id;
-        }
-
-        public int getOverlap() {
-            return overlap;
-        }
-
-        public boolean isChanged() {
-            return changed;
-        }
-    }
+		public boolean isChanged() {
+			return changed;
+		}
+	}
 }

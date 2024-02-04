@@ -44,7 +44,7 @@ public class Window {
 	protected boolean initialized = false;
 	protected long windowID;
 
-	protected WindowUtil.MonitorMatch previousMonitor;
+	protected WindowUtil.Monitor previousMonitor;
 	protected int previousWidth;
 	protected int previousHeight;
 
@@ -634,25 +634,38 @@ public class Window {
 		if (this.initialized && this.fullscreen != fullscreen) {
 			if (fullscreen) {
 				try {
-					WindowUtil.MonitorMatch monitorMatch = WindowUtil.getHoverMonitor(this.windowID);
+					WindowUtil.Monitor monitor = WindowUtil.getHoverMonitor(this.windowID);
 					this.previousWidth = this.getWidth();
 					this.previousHeight = this.getHeight();
-					WindowUtil.setMonitorMatch(this.windowID, monitorMatch);
-					this.previousMonitor = monitorMatch;
+					WindowUtil.setMonitor(this.windowID, monitor);
+					this.previousMonitor = monitor;
 				} catch (Exception e) {
 					System.err.print("Couldn't set fullscreen. ");
 					e.printStackTrace();
+					return; // prevent setting full screen if failed.
 				}
 			} else {
-				WindowUtil.MonitorMatch m = previousMonitor;
-				GLFW.glfwSetWindowMonitor(this.windowID,
-						m.getId(),
-						m.getX() + (m.getWidth() - previousWidth) / 2,
-						m.getY() + (m.getHeight() - previousHeight) / 2,
-						previousWidth,
-						previousHeight,
-						GLFW.GLFW_DONT_CARE
-				);
+				WindowUtil.Monitor m = previousMonitor;
+
+				if (m == null) {
+					GLFW.glfwSetWindowMonitor(this.windowID,
+							0L,
+							10,
+							10,
+							previousWidth,
+							previousHeight,
+							GLFW.GLFW_DONT_CARE
+					);
+				} else {
+					GLFW.glfwSetWindowMonitor(this.windowID,
+							0L,
+							m.getX() + (m.getWidth() - previousWidth) / 2,
+							m.getY() + (m.getHeight() - previousHeight) / 2,
+							previousWidth,
+							previousHeight,
+							GLFW.GLFW_DONT_CARE
+					);
+				}
 			}
 		}
 
