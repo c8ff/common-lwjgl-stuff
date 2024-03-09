@@ -630,6 +630,14 @@ public class Window {
 		GLFW.glfwWindowHint(name, value ? GLFW.GLFW_TRUE : GLFW.GLFW_FALSE);
 	}
 
+	public WindowUtil.Monitor getHoverMonitor() {
+		return WindowUtil.getHoverMonitor(this.windowID);
+	}
+
+	public void getCursorPos(double[] x, double[] y) {
+		GLFW.glfwGetCursorPos(this.windowID, x, y);
+	}
+
 	public void setFullscreen(boolean fullscreen) {
 		if (this.initialized && this.fullscreen != fullscreen) {
 			if (fullscreen) {
