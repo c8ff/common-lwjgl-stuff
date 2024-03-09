@@ -1,4 +1,4 @@
-package dev.seeight.common.lwjgl;
+package dev.seeight.common.lwjgl.sound;
 
 import dev.seeight.common.lwjgl.util.IOUtil;
 import org.lwjgl.openal.AL10;
@@ -15,30 +15,27 @@ import java.nio.ShortBuffer;
  *
  * @author C8FF
  */
-public class Sound {
+public class OpenALSound implements ISound {
 	private final int bufferId;
 	private final int sourceId;
 
-	private final String path;
-
-	private boolean isPlaying = false;
-	private boolean isPaused = false;
+	private boolean playing = false;
+	private boolean paused = false;
+	private boolean looping;
 
 	private boolean isDeleted = false;
 
 	private float gain = 0.3f;
 	private float pitch = 1;
 
-	public Sound(String path, boolean loop) {
+	public OpenALSound(String path, boolean loop) {
 		this(path, loop, true);
 	}
 
 	/**
 	 * Creates an ogg sound
 	 */
-	public Sound(String path, boolean loop, boolean jar) {
-		this.path = path;
-
+	public OpenALSound(String path, boolean loop, boolean jar) {
 		if (!path.endsWith(".ogg")) {
 			throw new UnsupportedOperationException("Unknown format. The file must be a vorbis file.");
 		}
@@ -52,7 +49,7 @@ public class Sound {
 
 			if (jar) {
 				try {
-					rawAudioBuffer = STBVorbis.stb_vorbis_decode_memory(IOUtil.byteBufferFrom(Sound.class, path), channelsBuffer, sampleRateBuffer);
+					rawAudioBuffer = STBVorbis.stb_vorbis_decode_memory(IOUtil.byteBufferFrom(OpenALSound.class, path), channelsBuffer, sampleRateBuffer);
 				} catch (IOException e) {
 					throw new RuntimeException("Couldn't read the specified sound file: " + path, e);
 				}
@@ -81,7 +78,7 @@ public class Sound {
 		this.sourceId = AL10.alGenSources();
 
 		this.alSourcei(AL10.AL_BUFFER, this.bufferId);
-		this.alSourcei(AL10.AL_LOOPING, loop ? 1 : 0);
+		this.setLooping(loop);
 		this.alSourcei(AL10.AL_POSITION, 0);
 
 		this.setGain(this.gain);
@@ -94,6 +91,7 @@ public class Sound {
 		AL10.alSourcei(this.sourceId, param, value);
 	}
 
+	@Override
 	public void delete() {
 		if (!this.isDeleted) {
 			AL10.alDeleteSources(this.sourceId);
@@ -103,6 +101,7 @@ public class Sound {
 		}
 	}
 
+	@Override
 	public void forcePlay() {
 		if (isPlaying()) {
 			stop();
@@ -111,78 +110,96 @@ public class Sound {
 		play();
 	}
 
+	@Override
 	public void play() {
 		int state = AL10.alGetSourcei(this.sourceId, AL10.AL_SOURCE_STATE);
 		if (state == AL10.AL_STOPPED) {
-			this.isPlaying = false;
+			this.playing = false;
 			AL10.alSourcei(this.sourceId, AL10.AL_POSITION, 0);
 		}
 
-		if (!this.isPlaying) {
+		if (!this.isPlaying()) {
 			AL10.alSourcePlay(this.sourceId);
-			this.isPlaying = true;
-			this.isPaused = false;
+			this.playing = true;
+			this.paused = false;
 		}
 	}
 
+	@Override
 	public void pause() {
-		if (this.isPlaying && !this.isPaused) {
+		if (this.playing && !this.paused) {
 			AL10.alSourcePause(this.sourceId);
-			this.isPaused = true;
+			this.paused = true;
 		}
 	}
 
+	@Override
 	public void resume() {
-		if (this.isPlaying && this.isPaused) {
+		if (this.playing && this.paused) {
 			AL10.alSourcePlay(this.sourceId);
-			this.isPaused = false;
+			this.paused = false;
 		}
 	}
 
+	@Override
 	public void stop() {
-		if (this.isPlaying) {
+		if (this.playing) {
 			AL10.alSourceStop(this.sourceId);
-			this.isPlaying = false;
-			this.isPaused = false;
+			this.playing = false;
+			this.paused = false;
 		}
 	}
 
-	public String getPath() {
-		return this.path;
-	}
-
+	@Override
 	public boolean isPlaying() {
 		int state = AL10.alGetSourcei(this.sourceId, AL10.AL_SOURCE_STATE);
 		if (state == AL10.AL_STOPPED) {
-			this.isPlaying = false;
+			this.playing = false;
 		}
 
-		return this.isPlaying;
+		return this.playing;
 	}
 
+	@Override
 	public boolean isPaused() {
-		return this.isPaused;
+		return this.paused;
 	}
 
+	@Override
 	public boolean isDeleted() {
 		return this.isDeleted;
 	}
 
+	@Override
 	public void setGain(float value) {
 		this.gain = value;
 		AL10.alSourcef(this.sourceId, AL10.AL_GAIN, this.gain);
 	}
 
+	@Override
 	public float getGain() {
 		return this.gain;
 	}
 
+	@Override
 	public void setPitch(float value) {
 		this.pitch = value;
 		AL10.alSourcef(this.sourceId, AL10.AL_PITCH, value);
 	}
 
+	@Override
 	public float getPitch() {
 		return this.pitch;
+	}
+
+	@Override
+	public void setLooping(boolean looping) {
+		this.looping = looping;
+		alSourcei(AL10.AL_LOOPING, looping ? 1 : 0);
+	}
+
+	@Override
+	public boolean isLooping() {
+		return looping;
 	}
 }
