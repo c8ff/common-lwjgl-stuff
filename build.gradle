@@ -4,6 +4,7 @@ plugins {
 }
 
 var lwjglVersion = "3.3.3"
+var lwjglNatives = "natives-windows"
 group = 'dev.seeight'
 version = '1.1'
 
@@ -61,6 +62,7 @@ dependencies {
     implementation "org.lwjgl:lwjgl-opengl"
     implementation "org.lwjgl:lwjgl-openal"
     implementation "org.lwjgl:lwjgl-stb"
+    implementation "org.lwjgl:lwjgl-nanovg"
 }
 
 java {
