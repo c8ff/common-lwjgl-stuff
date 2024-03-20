@@ -260,6 +260,10 @@ public class BufferedFontRenderer implements IFontRenderer {
 
 	}
 
+	public int getCharacterCapacity() {
+		return characterCapacity;
+	}
+
 	protected String getVertexSource() {
 		return """
 				#version 430
