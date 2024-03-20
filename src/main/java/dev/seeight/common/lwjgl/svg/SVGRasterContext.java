@@ -59,9 +59,10 @@ public class SVGRasterContext implements AutoCloseable {
 		try {
 			consumer.accept(s);
 		} catch (Exception e) {
-			NanoSVG.nsvgDelete(s);
 			e.printStackTrace();
 		}
+
+		NanoSVG.nsvgDelete(s);
 	}
 
 	public void raster(byte[] svgBytes, float scale, RasterConsumer consumer) {
