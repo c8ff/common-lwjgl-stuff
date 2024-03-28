@@ -118,7 +118,7 @@ public class BufferedFontRenderer implements IFontRenderer {
 	}
 
 	@Override
-	public float drawString(IFont font, char @NotNull [] characters, float x, float y, int start, int end) throws IndexOutOfBoundsException {
+	public float drawString(IFont font, char @NotNull [] characters, float x, float y, float startX, int start, int end) throws IndexOutOfBoundsException {
 		if (characters.length == 0)
 			return x;
 
@@ -131,7 +131,6 @@ public class BufferedFontRenderer implements IFontRenderer {
 		length = 0;
 		vertices = 0;
 		buffer.clear();
-		float startX = x;
 		float maxX = x;
 		for (int i = start; i < end; i++) {
 			int codePoint = characters[i];
@@ -211,10 +210,10 @@ public class BufferedFontRenderer implements IFontRenderer {
 
 	@Override
 	public void drawChar(IFont font, @NotNull CharacterData data, float _x, float _y) {
-		float x = _x + data.renderOriginX * this.getScaleX();
-		float y = _y + data.renderOriginY * this.getScaleY();
-		float x2 = x + data.renderWidth * this.getScaleX();
-		float y2 = y + data.renderHeight * this.getScaleY();
+		float x = (float) Math.floor(_x + data.renderOriginX * this.getScaleX());
+		float y = (float) Math.floor(_y + data.renderOriginY * this.getScaleY());
+		float x2 = (float) Math.round(x + data.renderWidth * this.getScaleX());
+		float y2 = (float) Math.round(y + data.renderHeight * this.getScaleY());
 
 		float u = (float) data.u();
 		float v = (float) data.v();

@@ -21,7 +21,7 @@ public interface IFontRenderer {
 	 * @throws IndexOutOfBoundsException If {@code start} or {@code end} are out of bounds.
 	 */
 	default float drawString(IFont font, String string, float x, float y) throws IndexOutOfBoundsException {
-		return drawString(font, string.toCharArray(), x, y, 0, string.length());
+		return drawString(font, string.toCharArray(), x, y, x, 0, string.length());
 	}
 
 	/**
@@ -37,7 +37,7 @@ public interface IFontRenderer {
 	 * @throws IndexOutOfBoundsException If {@code start} or {@code end} are out of bounds.
 	 */
 	default float drawString(IFont font, String string, float x, float y, int start, int end) throws IndexOutOfBoundsException {
-		return drawString(font, string.toCharArray(), x, y, start, end);
+		return drawString(font, string.toCharArray(), x, y, x, start, end);
 	}
 
 	/**
@@ -51,7 +51,7 @@ public interface IFontRenderer {
 	 * @throws IndexOutOfBoundsException If {@code start} or {@code end} are out of bounds.
 	 */
 	default float drawString(IFont font, char[] characters, float x, float y) throws IndexOutOfBoundsException {
-		return drawString(font, characters, x, y, 0, characters.length);
+		return drawString(font, characters, x, y, x, 0, characters.length);
 	}
 
 	/**
@@ -143,12 +143,28 @@ public interface IFontRenderer {
 	 * @throws IndexOutOfBoundsException If {@code start} or {@code end} are out of bounds.
 	 */
 	default float drawString(IFont font, char[] characters, float x, float y, int start, int end) throws IndexOutOfBoundsException {
+		return this.drawString(font, characters, x, y, x, start, end);
+	}
+
+	/**
+	 * Renders a string using the specified font.
+	 *
+	 * @param font       The font that the {@code characters} will be rendered with.
+	 * @param characters The characters that will be rendered.
+	 * @param x          The X position where the string will be rendered.
+	 * @param y          The Y position where the string will be rendered.
+	 * @param startX     The X position that new lines will be aligned to.
+	 * @param start      The start index inside {@code characters}.
+	 * @param end        The end index inside or equal to the length of {@code characters}.
+	 * @return The end of the string in the X axis.
+	 * @throws IndexOutOfBoundsException If {@code start} or {@code end} are out of bounds.
+	 */
+	default float drawString(IFont font, char[] characters, float x, float y, float startX, int start, int end) throws IndexOutOfBoundsException {
 		if (characters.length == 0)
 			return x;
 
 		IFontRenderer.assertIndices(characters.length, start, end);
 
-		float startX = x;
 		float maxX = x;
 		for (int i = start; i < end; i++) {
 			int codePoint = characters[i];
@@ -242,7 +258,7 @@ public interface IFontRenderer {
 
 	/**
 	 * Renders a character using the specified font.
-	 * Not recommended to use separately from {@link #drawString(IFont, char[], float, float, int, int)}.
+	 * Not recommended to use separately from {@link #drawString(IFont, char[], float, float, float, int, int)}.
 	 *
 	 * @param font The font to be used.
 	 * @param data The data of the character.
@@ -253,7 +269,7 @@ public interface IFontRenderer {
 
 	/**
 	 * Renders an unknown character using the specified font.
-	 * Not recommended to use separately from {@link #drawString(IFont, char[], float, float, int, int)}
+	 * Not recommended to use separately from {@link #drawString(IFont, char[], float, float, float, int, int)}
 	 *
 	 * @param font      The font to be used.
 	 * @param codepoint The codepoint of the character.
