@@ -3,6 +3,7 @@ package dev.seeight.common.lwjgl.font;
 import dev.seeight.common.lwjgl.font.json.CharacterData;
 import dev.seeight.common.lwjgl.font.json.FontData;
 import dev.seeight.renderer.renderer.Texture;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -63,12 +64,12 @@ public class AtlasFont implements IFont {
 	}
 
 	@Override
-	public Texture getTexture() {
+	public @NotNull Texture getTexture() {
 		return this.texture;
 	}
 
 	@Override
-	public String getName() {
+	public @NotNull String getName() {
 		return this.fontData.name;
 	}
 

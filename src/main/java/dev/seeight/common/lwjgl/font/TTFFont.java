@@ -4,6 +4,7 @@ import dev.seeight.common.lwjgl.font.json.CharacterData;
 import dev.seeight.common.lwjgl.util.IOUtil;
 import dev.seeight.renderer.renderer.Texture;
 import dev.seeight.renderer.renderer.gl.components.GLTexture;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL33;
@@ -22,6 +23,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class TTFFont implements IFont {
 	private static STBTTFontinfo _tempInfo;
@@ -175,12 +177,12 @@ public class TTFFont implements IFont {
 	}
 
 	@Override
-	public Texture getTexture() {
+	public @NotNull Texture getTexture() {
 		return this.texture;
 	}
 
 	@Override
-	public String getName() {
+	public @NotNull String getName() {
 		return this.name;
 	}
 

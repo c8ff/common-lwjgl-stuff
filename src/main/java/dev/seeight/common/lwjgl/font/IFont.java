@@ -2,6 +2,8 @@ package dev.seeight.common.lwjgl.font;
 
 import dev.seeight.common.lwjgl.font.json.CharacterData;
 import dev.seeight.renderer.renderer.Texture;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Holds the data of a font. These include, size, height, etc.
@@ -14,11 +16,13 @@ public interface IFont {
 	/**
 	 * The corresponding bitmap or SDF texture.
 	 */
+	@NotNull
 	Texture getTexture();
 
 	/**
 	 * The name of the string.
 	 */
+	@NotNull
 	String getName();
 
 	/**
@@ -51,5 +55,6 @@ public interface IFont {
 	/**
 	 * Gets the information (width, height, advance, origin, etc.) of a specific codepoint.
 	 */
+	@Nullable
 	CharacterData getCharacterData(int codepoint);
 }
