@@ -7,6 +7,7 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.libc.LibCStdlib;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
@@ -28,6 +29,7 @@ public class OpenALSound implements ISound {
 	private float gain = 0.3f;
 	private float pitch = 1;
 
+	@Deprecated
 	public OpenALSound(String path, boolean loop) {
 		this(path, loop, true);
 	}
@@ -35,6 +37,7 @@ public class OpenALSound implements ISound {
 	/**
 	 * Creates an ogg sound
 	 */
+	@Deprecated
 	public OpenALSound(String path, boolean loop, boolean jar) {
 		if (!path.endsWith(".ogg")) {
 			throw new UnsupportedOperationException("Unknown format. The file must be a vorbis file.");
@@ -85,6 +88,26 @@ public class OpenALSound implements ISound {
 		this.setPitch(this.pitch);
 
 		LibCStdlib.free(rawAudioBuffer);
+	}
+
+	public OpenALSound(int channels, int sampleRate, ShortBuffer rawAudioBuffer) {
+		int format = -1;
+		if (channels == 1) {
+			format = AL10.AL_FORMAT_MONO16;
+		} else if (channels == 2) {
+			format = AL10.AL_FORMAT_STEREO16;
+		}
+
+		this.bufferId = AL10.alGenBuffers();
+		AL10.alBufferData(this.bufferId, format, rawAudioBuffer, sampleRate);
+
+		this.sourceId = AL10.alGenSources();
+
+		this.alSourcei(AL10.AL_BUFFER, this.bufferId);
+		this.alSourcei(AL10.AL_POSITION, 0);
+
+		this.setGain(this.gain);
+		this.setPitch(this.pitch);
 	}
 
 	private void alSourcei(int param, int value) {
@@ -201,5 +224,47 @@ public class OpenALSound implements ISound {
 	@Override
 	public boolean isLooping() {
 		return looping;
+	}
+
+	public static OpenALSound fromInputStream(InputStream stream) throws IOException {
+		ShortBuffer rawAudioBuffer;
+
+		OpenALSound f;
+		try (MemoryStack stack = MemoryStack.stackPush()) {
+			IntBuffer channelsBuffer = stack.mallocInt(1);
+			IntBuffer sampleRateBuffer = stack.mallocInt(1);
+
+			rawAudioBuffer = STBVorbis.stb_vorbis_decode_memory(IOUtil.byteBufferFrom(stream), channelsBuffer, sampleRateBuffer);
+
+			if (rawAudioBuffer == null) {
+				throw new RuntimeException("Couldn't load sound from input stream." + stream);
+			}
+
+			f = new OpenALSound(channelsBuffer.get(), sampleRateBuffer.get(), rawAudioBuffer);
+			LibCStdlib.free(rawAudioBuffer);
+		}
+
+		return f;
+	}
+
+	public static OpenALSound fromFile(String path) {
+		ShortBuffer rawAudioBuffer;
+
+		OpenALSound f;
+		try (MemoryStack stack = MemoryStack.stackPush()) {
+			IntBuffer channelsBuffer = stack.mallocInt(1);
+			IntBuffer sampleRateBuffer = stack.mallocInt(1);
+
+			rawAudioBuffer = STBVorbis.stb_vorbis_decode_filename(path, channelsBuffer, sampleRateBuffer);
+
+			if (rawAudioBuffer == null) {
+				throw new RuntimeException("Couldn't load sound from file '" + path + "'.");
+			}
+
+			f = new OpenALSound(channelsBuffer.get(), sampleRateBuffer.get(), rawAudioBuffer);
+			LibCStdlib.free(rawAudioBuffer);
+		}
+
+		return f;
 	}
 }
