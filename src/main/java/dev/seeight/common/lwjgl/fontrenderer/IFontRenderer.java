@@ -372,4 +372,10 @@ public interface IFontRenderer {
 	default void setScale(float scale) {
 		this.setScale(scale, scale);
 	}
+
+	/**
+	 * Deletes and cleans-up the resources used by the renderer.
+	 * The renderer cannot be used after calling this method.
+	 */
+	void delete();
 }

@@ -74,4 +74,9 @@ public class FontRenderer implements IFontRenderer {
 	public void setScaleY(float scaleY) {
 		this.scaleY = scaleY;
 	}
+
+	@Override
+	public void delete() {
+		// No additional resources are allocated by this renderer.
+	}
 }

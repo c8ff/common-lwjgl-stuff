@@ -277,6 +277,13 @@ public class BufferedFontRenderer implements IFontRenderer {
 
 	}
 
+	@Override
+	public void delete() {
+		this.program.delete();
+		this.vbo.delete();
+		this.vao.delete();
+	}
+
 	public int getCharacterCapacity() {
 		return characterCapacity;
 	}
@@ -284,19 +291,18 @@ public class BufferedFontRenderer implements IFontRenderer {
 	protected String getVertexSource() {
 		return """
 				#version 430
-				
+
 				layout (location = 0) in vec4 vertex;
 
 				uniform mat4 projection;
 				uniform mat4 view;
-				
+
 				out vec2 fragCoords;
-                
+
 				void main() {
 					gl_Position = projection * view * vec4(vertex.xy, 0.0, 1.0);
 					fragCoords = vertex.zw;
-				}
-				""";
+				}""";
 	}
 
 	protected String getFragmentSource() {
@@ -308,10 +314,9 @@ public class BufferedFontRenderer implements IFontRenderer {
 				uniform vec4 shapeColor;
 				in vec2 fragCoords;
 				out vec4 color;
-                
+
 				void main() {
 					color = texture2D(t, fragCoords) * shapeColor;
-				}
-				""";
+				}""";
 	}
 }
