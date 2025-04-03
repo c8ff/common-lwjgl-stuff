@@ -66,6 +66,10 @@ public class Window {
 	protected int previousWidth;
 	protected int previousHeight;
 
+	protected int initX;
+	protected int initY;
+	protected boolean hasInitPos;
+
 	/**
 	 * The {@link #createWindow()} method must be called, or else the window won't be created.
 	 */
@@ -120,6 +124,11 @@ public class Window {
 		this.setWindowRefreshCallback(null);
 		this.setWindowPosCallback(null);
 		this.setCharModsCallback(null);
+
+		if (this.hasInitPos) {
+			this.setPosition(this.initX, this.initY);
+			this.hasInitPos = false;
+		}
 
 		// Make the window visible
 		if (this.visible) {
@@ -372,7 +381,7 @@ public class Window {
 		this.height = height;
 
 		if (this.initialized) {
-			GLFW.glfwSetWindowSize(this.windowID, width, height);
+			GLFW.glfwSetWindowMonitor(this.windowID, 0, this.getX(), this.getY(), width, height, 0);
 		}
 
 		return this;
@@ -383,6 +392,10 @@ public class Window {
 			this.x = x;
 			this.y = y;
 			GLFW.glfwSetWindowPos(this.windowID, x, y);
+		} else {
+			this.initX = x;
+			this.initY = y;
+			this.hasInitPos = true;
 		}
 
 		return this;
